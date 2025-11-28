@@ -1,6 +1,6 @@
 import { useMsal } from "@azure/msal-react";
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
-import { tokenRequest } from "../config/authConfig";
+import { tokenRequest, isLocalDevMode } from "../config/authConfig";
 import { useCallback, useMemo } from "react";
 
 /**
@@ -30,21 +30,28 @@ import { useCallback, useMemo } from "react";
  * ```
  */
 export const useAuth = () => {
-  const { instance, accounts } = useMsal();
+  const msalContext = isLocalDevMode ? null : useMsal();
+  const { instance, accounts } = msalContext || { instance: null, accounts: [] };
 
   const getAccessToken = useCallback(async (): Promise<string | null> => {
+    // Local dev mode: return mock token
+    if (isLocalDevMode) {
+      console.log('[useAuth] Local dev mode: returning mock token');
+      return 'mock-token-local-dev';
+    }
+
     if (accounts.length === 0) {
       return null;
     }
 
     const request = {
-      ...tokenRequest,
+      ...tokenRequest!,
       account: accounts[0],
     };
 
     try {
       // Try silent token acquisition first (uses cached token if valid)
-      const response = await instance.acquireTokenSilent(request);
+      const response = await instance!.acquireTokenSilent(request);
       return response.accessToken;
     } catch (error) {
       if (error instanceof InteractionRequiredAuthError) {
@@ -53,7 +60,7 @@ export const useAuth = () => {
           "Silent token acquisition failed, prompting for interaction"
         );
         try {
-          const response = await instance.acquireTokenPopup(request);
+          const response = await instance!.acquireTokenPopup(request);
           return response.accessToken;
         } catch (popupError) {
           console.error("Popup login failed:", popupError);
@@ -67,12 +74,12 @@ export const useAuth = () => {
 
   // Memoize computed values
   const isAuthenticated = useMemo(
-    () => accounts.length > 0,
+    () => isLocalDevMode || accounts.length > 0,
     [accounts.length]
   );
 
   const user = useMemo(
-    () => accounts[0],
+    () => isLocalDevMode ? { name: 'Local Developer', username: 'dev@local' } : accounts[0],
     [accounts]
   );
 

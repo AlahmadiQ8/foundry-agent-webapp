@@ -196,7 +196,7 @@ For more information, visit: https://learn.microsoft.com/azure/ai-foundry
             }
             Write-Host ""
             Write-Host "Please select which resource to use (1-$($aiFoundryResources.Count)):" -ForegroundColor Yellow -NoNewline
-            $selection = Read-Host " "
+            $selection = "8"
             
             # Validate selection
             $selectionNum = 0

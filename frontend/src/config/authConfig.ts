@@ -1,28 +1,33 @@
 import type { Configuration } from "@azure/msal-browser";
 import { LogLevel } from "@azure/msal-browser";
 
+// Check if we're in local dev mode (auth bypass)
+export const isLocalDevMode = import.meta.env.VITE_LOCAL_DEV_MODE === 'true';
+
 // Environment variables (must be set during build or deployment)
 const clientId = import.meta.env.VITE_ENTRA_SPA_CLIENT_ID;
 
-if (!clientId) {
+if (!clientId && !isLocalDevMode) {
   throw new Error(
     "VITE_ENTRA_SPA_CLIENT_ID is not set. This must be provided during build time. " +
-    "For local dev, ensure azd environment is configured and run preprovision hook."
+    "For local dev, ensure azd environment is configured and run preprovision hook, " +
+    "or set VITE_LOCAL_DEV_MODE=true to bypass authentication."
   );
 }
 
 const tenantId = import.meta.env.VITE_ENTRA_TENANT_ID;
 
-if (!tenantId) {
+if (!tenantId && !isLocalDevMode) {
   throw new Error(
     "VITE_ENTRA_TENANT_ID is not set. This must be provided during build time. " +
-    "For local dev, run setup-local-dev.ps1 to configure from azd environment."
+    "For local dev, run setup-local-dev.ps1 to configure from azd environment, " +
+    "or set VITE_LOCAL_DEV_MODE=true to bypass authentication."
   );
 }
 
-export const msalConfig: Configuration = {
+export const msalConfig: Configuration | null = isLocalDevMode ? null : {
   auth: {
-    clientId: clientId,
+    clientId: clientId!,
     authority: `https://login.microsoftonline.com/${tenantId}`,
     redirectUri: window.location.origin, // Will be https://<container-app-url> in production
     postLogoutRedirectUri: window.location.origin,
@@ -57,11 +62,11 @@ export const msalConfig: Configuration = {
 };
 
 // API permission scope (will match app registration in Step 08)
-export const loginRequest = {
+export const loginRequest = isLocalDevMode ? null : {
   scopes: [`api://${clientId}/Chat.ReadWrite`],
 };
 
-export const tokenRequest = {
+export const tokenRequest = isLocalDevMode ? null : {
   scopes: [`api://${clientId}/Chat.ReadWrite`],
   forceRefresh: false, // Use cached token if valid
 };

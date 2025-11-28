@@ -36,7 +36,7 @@ VITE_API_URL=/api
 ## Key Components
 
 | Component | Purpose |
-|-----------|---------||
+|-----------|---------|
 | `AgentPreview.tsx` | Container wiring chat state to controlled `ChatInterface` |
 | `ChatInterface.v2.tsx` | Stateless controlled UI; renders messages, input, errors |
 | `chat/AssistantMessage.tsx` | Memoized assistant message with streaming support |

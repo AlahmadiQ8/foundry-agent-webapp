@@ -26,7 +26,7 @@ ENV VITE_ENTRA_TENANT_ID=$ENTRA_TENANT_ID
 RUN npm run build
 
 # Stage 2: Build .NET API Backend
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS backend-builder
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0 AS backend-builder
 
 WORKDIR /app
 

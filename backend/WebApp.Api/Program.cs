@@ -3,6 +3,7 @@ using Microsoft.Identity.Web;
 using WebApp.Api.Models;
 using WebApp.Api.Services;
 using System.Security.Claims;
+using WebApp.Api;
 
 // Load .env file for local development BEFORE building the configuration
 // In production (Docker), Container Apps injects environment variables directly
@@ -93,33 +94,56 @@ if (!string.IsNullOrEmpty(tenantId))
 const string RequiredScope = "Chat.ReadWrite";
 const string ScopePolicyName = "RequireChatScope";
 
-// Add Microsoft Identity Web authentication
-// Validates JWT bearer tokens issued for the SPA's delegated scope
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(options =>
-    {
-        builder.Configuration.Bind("AzureAd", options);
-        var configuredClientId = builder.Configuration["AzureAd:ClientId"];
+// Check if we're in local dev mode (auth bypass)
+var isLocalDevMode = builder.Configuration.GetValue<bool>("LOCAL_DEV_MODE");
 
-        options.TokenValidationParameters.ValidAudiences = new[]
-        {
-            configuredClientId,
-            $"api://{configuredClientId}"
-        };
-
-        options.TokenValidationParameters.NameClaimType = ClaimTypes.Name;
-        options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
-    }, options => builder.Configuration.Bind("AzureAd", options));
-
-builder.Services.AddAuthorization(options =>
+if (isLocalDevMode)
 {
-    // Use Microsoft.Identity.Web's built-in scope validation
-    options.AddPolicy(ScopePolicyName, policy =>
+    // Local dev mode: skip authentication
+    Console.WriteLine("[Program] Running in LOCAL DEV MODE - Authentication bypassed");
+    
+    builder.Services.AddAuthentication()
+        .AddScheme<Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, NoOpAuthenticationHandler>(
+            JwtBearerDefaults.AuthenticationScheme,
+            options => { });
+    
+    builder.Services.AddAuthorization(options =>
     {
-        policy.RequireAuthenticatedUser();
-        policy.RequireScope(RequiredScope);
+        options.AddPolicy(ScopePolicyName, policy =>
+        {
+            policy.RequireAssertion(_ => true); // Always allow in local dev mode
+        });
     });
-});
+}
+else
+{
+    // Production mode: normal authentication
+    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddMicrosoftIdentityWebApi(options =>
+        {
+            builder.Configuration.Bind("AzureAd", options);
+            var configuredClientId = builder.Configuration["AzureAd:ClientId"];
+
+            options.TokenValidationParameters.ValidAudiences = new[]
+            {
+                configuredClientId,
+                $"api://{configuredClientId}"
+            };
+
+            options.TokenValidationParameters.NameClaimType = ClaimTypes.Name;
+            options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
+        }, options => builder.Configuration.Bind("AzureAd", options));
+
+    builder.Services.AddAuthorization(options =>
+    {
+        // Use Microsoft.Identity.Web's built-in scope validation
+        options.AddPolicy(ScopePolicyName, policy =>
+        {
+            policy.RequireAuthenticatedUser();
+            policy.RequireScope(RequiredScope);
+        });
+    });
+}
 
 // Register Azure AI Agent Service as scoped
 // Scoped is preferred for services making external API calls to ensure proper disposal

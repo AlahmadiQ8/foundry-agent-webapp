@@ -101,6 +101,11 @@ azd env set AI_AGENT_ID <agent-name>
 # - C#: Watch mode recompilation
 # - Test at http://localhost:5173
 
+# Local development without authentication (faster iteration)
+# See LOCAL_DEV_MODE.md for details
+# Set VITE_LOCAL_DEV_MODE=true in frontend/.env.local
+# Set LOCAL_DEV_MODE=true in backend/WebApp.Api/.env
+
 # Deploy code changes to Azure
 .\deployment\scripts\deploy.ps1  # 3-5 minutes
 ```

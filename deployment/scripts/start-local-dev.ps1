@@ -229,7 +229,8 @@ $projectRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 # Start both servers in parallel
 Write-Host "`nStarting backend (ASP.NET Core on port 8080)..." -ForegroundColor Cyan
 $backendPath = Join-Path $projectRoot "backend" "WebApp.Api"
-Start-Process pwsh -ArgumentList "-NoExit", "-Command", "cd '$backendPath'; Write-Host '=== Backend (ASP.NET Core) ===' -ForegroundColor Green; dotnet watch run --no-hot-reload"
+$backendCmd = "cd '$backendPath'; `$env:LOCAL_DEV_MODE='true'; Write-Host '=== Backend (ASP.NET Core - LOCAL DEV MODE) ===' -ForegroundColor Green; Write-Host 'Authentication bypassed for local development' -ForegroundColor Yellow; dotnet watch run --no-hot-reload"
+Start-Process pwsh -ArgumentList "-NoExit", "-Command", $backendCmd
 
 Write-Host "Starting frontend (React with HMR on port 5173)..." -ForegroundColor Cyan
 $frontendPath = Join-Path $projectRoot "frontend"

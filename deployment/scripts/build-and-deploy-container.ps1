@@ -83,7 +83,7 @@ if ($dockerAvailable) {
     
     Push-Location $projectRoot
     try {
-        docker build `
+        docker build --platform linux/amd64 `
             --build-arg ENTRA_SPA_CLIENT_ID=$ClientId `
             --build-arg ENTRA_TENANT_ID=$TenantId `
             -f .\deployment\docker\frontend.Dockerfile `

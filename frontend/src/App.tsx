@@ -4,7 +4,7 @@ import { useAppState } from './hooks/useAppState';
 import { InteractionType } from "@azure/msal-browser";
 import { ErrorBoundary } from "./components/core/ErrorBoundary";
 import { AgentPreview } from "./components/AgentPreview";
-import { loginRequest } from "./config/authConfig";
+import { loginRequest, isLocalDevMode } from "./config/authConfig";
 import { useState, useEffect } from "react";
 import { useAuth } from "./hooks/useAuth";
 import type { IAgentMetadata } from "./types/chat";
@@ -16,8 +16,10 @@ export interface ChatInterfaceRef {
 }
 
 function App() {
-  // This hook handles authentication automatically - redirects if not authenticated
-  useMsalAuthentication(InteractionType.Redirect, loginRequest);
+  // This hook handles authentication automatically - redirects if not authenticated (production only)
+  if (!isLocalDevMode) {
+    useMsalAuthentication(InteractionType.Redirect, loginRequest!);
+  }
   const { auth } = useAppState();
   const { getAccessToken } = useAuth();
   const [agentMetadata, setAgentMetadata] = useState<IAgentMetadata | null>(null);
@@ -68,35 +70,45 @@ function App() {
     fetchAgentMetadata();
   }, [auth.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const loadingView = (
+    <div className="app-container" style={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center', 
+      height: '100vh', 
+      flexDirection: 'column', 
+      gap: '1rem' 
+    }}>
+      <Spinner size="large" />
+      <p style={{ margin: 0 }}>
+        {auth.status === 'initializing' ? 'Preparing your session...' : 'Loading agent...'}
+      </p>
+    </div>
+  );
+
+  const agentView = agentMetadata && (
+    <div className="app-container">
+      <AgentPreview 
+        agentId={agentMetadata.id}
+        agentName={agentMetadata.name}
+        agentDescription={agentMetadata.description || undefined}
+        agentLogo={agentMetadata.metadata?.logo}
+      />
+    </div>
+  );
+
   return (
     <ErrorBoundary>
       {auth.status === 'initializing' || isLoadingAgent ? (
-        <div className="app-container" style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          height: '100vh', 
-          flexDirection: 'column', 
-          gap: '1rem' 
-        }}>
-          <Spinner size="large" />
-          <p style={{ margin: 0 }}>
-            {auth.status === 'initializing' ? 'Preparing your session...' : 'Loading agent...'}
-          </p>
-        </div>
+        loadingView
+      ) : isLocalDevMode ? (
+        // Local dev mode: no auth templates
+        agentView
       ) : (
+        // Production mode: use MSAL templates
         <>
           <AuthenticatedTemplate>
-            {agentMetadata && (
-              <div className="app-container">
-                <AgentPreview 
-                  agentId={agentMetadata.id}
-                  agentName={agentMetadata.name}
-                  agentDescription={agentMetadata.description || undefined}
-                  agentLogo={agentMetadata.metadata?.logo}
-                />
-              </div>
-            )}
+            {agentView}
           </AuthenticatedTemplate>
           <UnauthenticatedTemplate>
             <div className="app-container" style={{ 
