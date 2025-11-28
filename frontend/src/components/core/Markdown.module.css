@@ -5,6 +5,8 @@
   word-wrap: break-word;
   overflow-wrap: break-word;
   max-width: 100%;
+  direction: rtl;
+  text-align: right;
 }
 
 .paragraph {
@@ -89,7 +91,8 @@
 }
 
 .list {
-  padding-left: 2em;
+  padding-right: 2em;
+  padding-left: 0;
   margin-bottom: 16px;
 }
 
@@ -99,7 +102,8 @@
 
 .markdown ul,
 .markdown ol {
-  padding-left: 2em;
+  padding-right: 2em;
+  padding-left: 0;
   margin-bottom: 16px;
 }
 
@@ -158,7 +162,8 @@
 .markdown blockquote {
   padding: 0 1em;
   color: var(--colorNeutralForeground2);
-  border-left: 4px solid var(--colorNeutralStroke2);
+  border-right: 4px solid var(--colorNeutralStroke2);
+  border-left: none;
   margin: 0 0 16px;
 }
 
@@ -177,7 +182,7 @@
 
 .markdown th {
   background-color: var(--colorNeutralBackground3);
-  text-align: left;
+  text-align: right;
   font-weight: 600;
 }
 

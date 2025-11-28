@@ -14,9 +14,9 @@ interface IStarterMessageProps {
 // Customize these based on your agent's capabilities
 // The Azure sample also uses hardcoded prompts in the frontend
 const defaultStarterPrompts = [
-  "How can you help me?",
-  "What are your capabilities?",
-  "Tell me about yourself",
+  "ما هي الاجازات لسنة 2025؟",
+  "ما هي البدلات المتوفرة لكل مسمى وظيفي؟",
+  "كيف يمكنك مساعدتي؟",
 ];
 
 export const StarterMessages = ({

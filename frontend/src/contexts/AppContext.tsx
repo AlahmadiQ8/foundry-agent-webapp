@@ -70,13 +70,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Initialize auth state from MSAL or local dev mode
   useEffect(() => {
+    // Only initialize if not already authenticated (prevents infinite loop)
+    if (state.auth.status === 'authenticated') return;
+    
     if (import.meta.env.VITE_LOCAL_DEV_MODE === 'true') {
       // Local dev mode: immediately mark as authenticated
       dispatch({ type: 'AUTH_INITIALIZED', user: { name: 'Local Developer', username: 'dev@local' } as any });
     } else if (accounts.length > 0) {
       dispatch({ type: 'AUTH_INITIALIZED', user: accounts[0] });
     }
-  }, [accounts]);
+  }, [accounts, state.auth.status]);
 
   // Dev mode: Log when provider mounts and unmounts
   useEffect(() => {

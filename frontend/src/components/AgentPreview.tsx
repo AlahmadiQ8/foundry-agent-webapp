@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { ChatInterface } from './ChatInterface';
 import { SettingsPanel } from './core/SettingsPanel';
-import { BuiltWithBadge } from './core/BuiltWithBadge';
 import { useAppState } from '../hooks/useAppState';
 import { useAuth } from '../hooks/useAuth';
 import { ChatService } from '../services/chatService';
@@ -63,8 +62,6 @@ export const AgentPreview: React.FC<AgentPreviewProps> = ({ agentName, agentDesc
           agentDescription={agentDescription}
           agentLogo={agentLogo}
         />
-        
-        <BuiltWithBadge className={styles.builtWithBadge} />
       </div>
       
       <SettingsPanel
