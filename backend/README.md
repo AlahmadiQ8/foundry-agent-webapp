@@ -17,6 +17,7 @@ ASP.NET Core 9 Minimal API application that:
 - **AI Agent Integration**: Azure.AI.Agents.Persistent v1.2.0-beta.6 (pinned)
 - **Streaming**: SSE-based chat streaming with cancellation support
 - **Environment-Aware Auth**: ChainedTokenCredential (dev) / ManagedIdentityCredential (prod)
+- **Blob SAS Tokens**: User delegation SAS tokens for secure blob access in citations
 
 ## Project Structure
 
@@ -74,6 +75,15 @@ Environment variables are loaded before ASP.NET Core configuration builder runs.
 | `/api/threads` | POST | Required | Create new thread (future) |
 
 All endpoints require `Chat.ReadWrite` scope in JWT token.
+
+## Blob SAS Configuration
+
+The backend automatically appends user delegation SAS tokens to blob storage URIs in chat citations. See `BLOB_SAS_CONFIGURATION.md` for detailed setup instructions.
+
+**Quick setup**:
+1. Set `STORAGE_ACCOUNT_NAME` environment variable
+2. Assign **Storage Blob Data Reader** and **Storage Blob Delegator** roles to the managed identity
+3. Citations with blob URIs will automatically include time-limited SAS tokens
 
 ## Development Tips
 

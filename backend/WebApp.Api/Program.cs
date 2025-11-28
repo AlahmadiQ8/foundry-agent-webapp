@@ -149,6 +149,7 @@ else
 // Scoped is preferred for services making external API calls to ensure proper disposal
 // and avoid potential issues with long-lived connections
 builder.Services.AddScoped<WebApp.Api.Services.AzureAIAgentService>();
+builder.Services.AddScoped<WebApp.Api.Services.BlobSasService>();
 
 var app = builder.Build();
 
@@ -198,6 +199,7 @@ app.MapGet("/api/health", (HttpContext context) =>
 app.MapPost("/api/chat/stream", async (
     ChatRequest request,
     AzureAIAgentService agentService,
+    BlobSasService blobSasService,
     HttpContext httpContext,
     IHostEnvironment environment,
     CancellationToken cancellationToken) =>
@@ -241,7 +243,15 @@ app.MapPost("/api/chat/stream", async (
         var citations = await agentService.GetLastRunCitationsAsync(cancellationToken);
         if (citations != null && citations.Count > 0)
         {
-            await WriteCitationsEvent(httpContext.Response, citations, cancellationToken);
+            // Append SAS tokens to citation URIs
+            var citationsWithSas = new List<ChatCitation>();
+            foreach (var citation in citations)
+            {
+                var uriWithSas = await blobSasService.AppendSasTokenAsync(citation.Uri, cancellationToken);
+                citationsWithSas.Add(citation with { Uri = uriWithSas });
+            }
+            
+            await WriteCitationsEvent(httpContext.Response, citationsWithSas, cancellationToken);
         }
 
         await WriteDoneEvent(httpContext.Response, cancellationToken);

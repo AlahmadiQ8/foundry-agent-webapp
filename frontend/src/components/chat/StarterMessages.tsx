@@ -14,7 +14,7 @@ interface IStarterMessageProps {
 // Customize these based on your agent's capabilities
 // The Azure sample also uses hardcoded prompts in the frontend
 const defaultStarterPrompts = [
-  "ما هي الاجازات لسنة 2025؟",
+  "ما هي الاجازات المتاحة للموظف لسنة 2025؟",
   "ما هي البدلات المتوفرة لكل مسمى وظيفي؟",
   "كيف يمكنك مساعدتي؟",
 ];
