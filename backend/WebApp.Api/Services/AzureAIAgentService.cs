@@ -1,3 +1,4 @@
+using Azure;
 using Azure.AI.Projects;
 using Azure.AI.Projects.OpenAI;
 using Azure.Core;
@@ -19,6 +20,7 @@ public class AzureAIAgentService : IDisposable
     private AgentMetadataResponse? _cachedMetadata; // Cache metadata to avoid repeated calls
     private readonly SemaphoreSlim _agentLock = new(1, 1);
     private UsageInfo? _lastRunUsage;
+    private List<ChatCitation>? _lastRunCitations;
     private bool _disposed = false;
 
     public AzureAIAgentService(
@@ -244,6 +246,38 @@ public class AzureAIAgentService : IDisposable
             }
             if (update is StreamingResponseCompletedUpdate completedUpdate)
             {
+                var outputItems = completedUpdate.Response.OutputItems
+                .Where(item => item is MessageResponseItem)
+                .Select(item => item as MessageResponseItem)
+                .Where(message => message != null)
+                .SelectMany(message => message!.Content
+                    .Where(contentPart => contentPart.OutputTextAnnotations != null)
+                    .SelectMany(contentPart => contentPart.OutputTextAnnotations)
+                );
+                
+                // Collect citations
+                var citations = new List<ChatCitation>();
+                foreach (var annotation in outputItems)
+                {
+                    if (annotation is UriCitationMessageAnnotation uriCitation)
+                    {
+                        citations.Add(new ChatCitation
+                        {
+                            Uri = uriCitation.Uri?.ToString() ?? string.Empty,
+                            Title = uriCitation.Title
+                        });
+                        
+                        _logger.LogDebug("Output URI Citation: URI={Uri}, Title={Title}",
+                            uriCitation.Uri, uriCitation.Title);
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Output Text Annotation: Type={Type}, Detail={Detail}",
+                            annotation.Kind, annotation.ToString());
+                    }
+                }
+                
+                _lastRunCitations = citations.Count > 0 ? citations : null;
                 _lastRunUsage = ExtractUsageInfo(completedUpdate.Response.Usage);
             }
         }
@@ -378,6 +412,13 @@ public class AzureAIAgentService : IDisposable
         ObjectDisposedException.ThrowIf(_disposed, this);
         
         return Task.FromResult(_lastRunUsage);
+    }
+
+    public Task<List<ChatCitation>?> GetLastRunCitationsAsync(CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        
+        return Task.FromResult(_lastRunCitations);
     }
 
     /// <summary>

@@ -2,7 +2,7 @@
  * SSE event types from Azure AI Agent streaming API.
  * Contract: Backend sends Server-Sent Events with these event types.
  */
-export type SseEventType = 'conversationId' | 'chunk' | 'usage' | 'done' | 'error';
+export type SseEventType = 'conversationId' | 'chunk' | 'usage' | 'done' | 'error' | 'citations';
 
 export interface SseEvent {
   type: SseEventType;

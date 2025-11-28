@@ -360,6 +360,16 @@ export class ChatService {
               });
               break;
 
+            case 'citations':
+              if (event.data.citations && event.data.citations.length > 0) {
+                this.dispatch({
+                  type: 'CHAT_ADD_CITATIONS',
+                  messageId,
+                  citations: event.data.citations,
+                });
+              }
+              break;
+
             case 'done':
               return;
 

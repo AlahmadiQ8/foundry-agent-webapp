@@ -4,6 +4,7 @@ export interface IChatItem {
   content: string;
   duration?: number; // response time in ms
   attachments?: IFileAttachment[]; // File attachments
+  citations?: ICitation[]; // Citations from agent response
   more?: {
     time?: string; // ISO timestamp
     usage?: IUsageInfo; // Usage info from backend
@@ -21,6 +22,12 @@ export interface IFileAttachment {
   fileName: string;
   fileSizeBytes: number;
   dataUri?: string; // Base64 data URI for inline image preview
+}
+
+// Agent metadata types
+export interface ICitation {
+  uri: string;
+  title?: string | null;
 }
 
 // Agent metadata types

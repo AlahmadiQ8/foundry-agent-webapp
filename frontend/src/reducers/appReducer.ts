@@ -140,6 +140,33 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
       };
     }
 
+    case 'CHAT_ADD_CITATIONS': {
+      // Add citations to the specified message
+      const messageIndex = state.chat.messages.findIndex(
+        msg => msg.id === action.messageId
+      );
+      
+      if (messageIndex === -1) {
+        // Message not found - return unchanged state
+        return state;
+      }
+      
+      // Create new array with updated message
+      const updatedMessages = [...state.chat.messages];
+      updatedMessages[messageIndex] = {
+        ...updatedMessages[messageIndex],
+        citations: action.citations,
+      };
+      
+      return {
+        ...state,
+        chat: {
+          ...state.chat,
+          messages: updatedMessages,
+        },
+      };
+    }
+
     case 'CHAT_CANCEL_STREAM':
       return {
         ...state,

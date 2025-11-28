@@ -46,6 +46,7 @@ export type AppAction =
   | { type: 'CHAT_START_STREAM'; conversationId?: string; messageId: string }
   | { type: 'CHAT_STREAM_CHUNK'; messageId: string; content: string }
   | { type: 'CHAT_STREAM_COMPLETE'; usage: IUsageInfo }
+  | { type: 'CHAT_ADD_CITATIONS'; messageId: string; citations: IChatItem['citations'] }
   | { type: 'CHAT_CANCEL_STREAM' }
   | { type: 'CHAT_ERROR'; error: AppError } // Enhanced error object
   | { type: 'CHAT_CLEAR_ERROR' } // Clear error state

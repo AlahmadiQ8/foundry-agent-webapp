@@ -238,6 +238,12 @@ app.MapPost("/api/chat/stream", async (
             }, cancellationToken);
         }
 
+        var citations = await agentService.GetLastRunCitationsAsync(cancellationToken);
+        if (citations != null && citations.Count > 0)
+        {
+            await WriteCitationsEvent(httpContext.Response, citations, cancellationToken);
+        }
+
         await WriteDoneEvent(httpContext.Response, cancellationToken);
     }
     catch (ArgumentException ex) when (ex.Message.Contains("Invalid image attachments"))
@@ -293,6 +299,17 @@ static async Task WriteUsageEvent(HttpResponse response, object usageData, Cance
         promptTokens = ((dynamic)usageData).promptTokens,
         completionTokens = ((dynamic)usageData).completionTokens,
         totalTokens = ((dynamic)usageData).totalTokens
+    });
+    await response.WriteAsync($"data: {json}\n\n", ct);
+    await response.Body.FlushAsync(ct);
+}
+
+static async Task WriteCitationsEvent(HttpResponse response, List<ChatCitation> citations, CancellationToken ct)
+{
+    var json = System.Text.Json.JsonSerializer.Serialize(new
+    {
+        type = "citations",
+        citations = citations.Select(c => new { uri = c.Uri, title = c.Title })
     });
     await response.WriteAsync($"data: {json}\n\n", ct);
     await response.Body.FlushAsync(ct);

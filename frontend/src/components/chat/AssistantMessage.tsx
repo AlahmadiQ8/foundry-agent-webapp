@@ -4,6 +4,7 @@ import { CopilotMessage } from '@fluentui-copilot/react-copilot-chat';
 import { Markdown } from '../core/Markdown';
 import { AgentIcon } from '../core/AgentIcon';
 import { UsageInfo } from './UsageInfo';
+import { Citations } from './Citations';
 import { useFormatTimestamp } from '../../hooks/useFormatTimestamp';
 import type { IChatItem } from '../../types/chat';
 import styles from './AssistantMessage.module.css';
@@ -54,21 +55,27 @@ function AssistantMessageComponent({
           <span></span>
         </div>
       ) : (
-        <Suspense fallback={<Spinner size="small" />}>
-          <Markdown content={message.content} />
-        </Suspense>
+        <>
+          <Suspense fallback={<Spinner size="small" />}>
+            <Markdown content={message.content} />
+          </Suspense>
+          {message.citations && message.citations.length > 0 && (
+            <Citations citations={message.citations} />
+          )}
+        </>
       )}
     </CopilotMessage>
   );
 }
 
 export const AssistantMessage = memo(AssistantMessageComponent, (prev, next) => {
-  // Re-render only if streaming state or content/usage changes
+  // Re-render only if streaming state or content/usage/citations changes
   return (
     prev.message.id === next.message.id &&
     prev.message.content === next.message.content &&
     prev.isStreaming === next.isStreaming &&
     prev.agentLogo === next.agentLogo &&
-    prev.message.more?.usage === next.message.more?.usage
+    prev.message.more?.usage === next.message.more?.usage &&
+    prev.message.citations === next.message.citations
   );
 });
