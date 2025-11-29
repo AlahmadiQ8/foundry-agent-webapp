@@ -42,6 +42,7 @@ if (isLocalDevMode) {
   console.log('[main] Running in LOCAL DEV MODE - Authentication bypassed');
   renderApp();
 } else {
+  console.log("[main] Running in PRODUCTION MODE - Authentication enabled");
   // Initialize MSAL instance for production
   const msalInstance = new PublicClientApplication(msalConfig!);
 

@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
   // Map to VITE_ prefixed vars for client access (Vite only exposes VITE_ prefixed vars)
   process.env.VITE_ENTRA_SPA_CLIENT_ID = env.ENTRA_SPA_CLIENT_ID || env.VITE_ENTRA_SPA_CLIENT_ID;
   process.env.VITE_ENTRA_TENANT_ID = env.ENTRA_TENANT_ID || env.VITE_ENTRA_TENANT_ID;
-  process.env.VITE_LOCAL_DEV_MODE = env.LOCAL_DEV_MODE || env.VITE_LOCAL_DEV_MODE || "false";
+  process.env.VITE_LOCAL_DEV_MODE = "true";
 
   return {
     plugins: [react()],
