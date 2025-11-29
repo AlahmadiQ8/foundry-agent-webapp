@@ -24,6 +24,12 @@
   align-items: center;
 }
 
+@media (max-width: 768px) {
+  .messagesContainer {
+    padding: 1rem 0.5rem;
+  }
+}
+
 /* Messages wrapper - constrain max width for readability */
 .messagesWrapper {
   width: 100%;
@@ -102,4 +108,10 @@
   max-width: 900px;
   padding: 0 1rem;
   box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .errorWrapper {
+    padding: 0 0.5rem;
+  }
 }
