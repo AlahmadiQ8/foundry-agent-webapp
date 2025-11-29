@@ -243,9 +243,15 @@ app.MapPost("/api/chat/stream", async (
         var citations = await agentService.GetLastRunCitationsAsync(cancellationToken);
         if (citations != null && citations.Count > 0)
         {
-            // Append SAS tokens to citation URIs
+            // Deduplicate citations by URI before adding SAS tokens
+            var uniqueCitations = citations
+                .GroupBy(c => c.Uri)
+                .Select(g => g.First())
+                .ToList();
+            
+            // Append SAS tokens to unique citation URIs
             var citationsWithSas = new List<ChatCitation>();
-            foreach (var citation in citations)
+            foreach (var citation in uniqueCitations)
             {
                 var uriWithSas = await blobSasService.AppendSasTokenAsync(citation.Uri, cancellationToken);
                 citationsWithSas.Add(citation with { Uri = uriWithSas });
