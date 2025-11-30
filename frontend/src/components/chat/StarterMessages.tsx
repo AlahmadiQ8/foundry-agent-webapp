@@ -34,7 +34,7 @@ export const StarterMessages = ({
           logoUrl={agentLogo}
         />
         <Subtitle1 className={styles.welcome}>
-          {agentName ? `Hello! I'm ${agentName}` : "Hello! How can I help you today?"}
+          مرحباً! أنا مساعدك الرقمي في ديوان الخدمة المدنية
         </Subtitle1>
         {agentDescription && (
           <Body1 className={styles.caption}>{agentDescription}</Body1>

@@ -144,6 +144,16 @@ public class AzureAIAgentService : IDisposable
         var agent = await GetAgentAsync(cancellationToken);
         PromptAgentDefinition? promptAgentDefinition = (agent.Definition as PromptAgentDefinition);
 
+        // Get metadata from agent, or create empty dictionary if null
+        var metadata = agent.Metadata?.ToDictionary(kvp => kvp.Key, kvp => kvp.Value) 
+            ?? new Dictionary<string, string>();
+        
+        // Always set CSC logo if not already present in agent metadata
+        if (!metadata.ContainsKey("logo"))
+        {
+            metadata["logo"] = "/csc-logo.png";
+        }
+        
         _cachedMetadata = new AgentMetadataResponse
         {
             Id = agent.Id,//persistentAgent.Value.Id,
@@ -153,7 +163,7 @@ public class AzureAIAgentService : IDisposable
             Description = agent.Description,
             Model = promptAgentDefinition?.Model ?? string.Empty,
             Instructions = promptAgentDefinition?.Instructions ?? string.Empty,
-            Metadata = agent.Metadata?.ToDictionary(kvp => kvp.Key, kvp => kvp.Value)
+            Metadata = metadata
         };
         
         _logger.LogInformation("Cached agent metadata for future requests");

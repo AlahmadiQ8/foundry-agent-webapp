@@ -1,10 +1,14 @@
-import { Suspense, memo } from 'react';
-import { Spinner } from '@fluentui/react-components';
+import { Suspense, memo, useMemo } from 'react';
+import { Spinner, Image, type JSXElement } from '@fluentui/react-components';
+import {
+  ReferenceList,
+  ReferenceOverflowButton,
+  generateReferenceCitationPreview,
+} from "@fluentui-copilot/react-reference";
 import { CopilotMessage } from '@fluentui-copilot/react-copilot-chat';
 import { Markdown } from '../core/Markdown';
 import { AgentIcon } from '../core/AgentIcon';
 import { UsageInfo } from './UsageInfo';
-import { Citations } from './Citations';
 import { useFormatTimestamp } from '../../hooks/useFormatTimestamp';
 import type { IChatItem } from '../../types/chat';
 import styles from './AssistantMessage.module.css';
@@ -18,7 +22,7 @@ interface AssistantMessageProps {
 
 function AssistantMessageComponent({ 
   message, 
-  agentName = 'AI Assistant',
+  agentName = 'مساعد ديوان الخدمة المدنية',
   agentLogo,
   isStreaming = false,
 }: AssistantMessageProps) {
@@ -28,6 +32,39 @@ function AssistantMessageComponent({
   // Show custom loading indicator when streaming with no content
   const showLoadingDots = isStreaming && !message.content;
   
+  // Generate reference components from message citations
+  const referenceComponents = useMemo(() => {
+    if (!message.citations || message.citations.length === 0) {
+      return [];
+    }
+
+    const references: JSXElement[] = [];
+    
+    for (let i = 0; i < message.citations.length; i++) {
+      const citation = message.citations[i];
+      const { Reference } = generateReferenceCitationPreview({
+        index: i + 1,
+        referenceProps: {
+          target: "_blank",
+          rel: "noopener noreferrer",
+          children: citation.title || citation.uri,
+          href: citation.uri,
+          graphic: (
+            <Image
+              alt="Document"
+              height={16}
+              src="https://res-1.cdn.office.net/files/fabric-cdn-prod_20221209.001/assets/item-types/16/genericfile.svg"
+              width={16}
+            />
+          ),
+        },
+      });
+      references.push(<Reference key={`citation-${message.id}-${i}`} />);
+    }
+    
+    return references;
+  }, [message.citations, message.id]);
+  
   return (
     <CopilotMessage
       id={`msg-${message.id}`}
@@ -35,7 +72,7 @@ function AssistantMessageComponent({
       name={agentName}
       loadingState="none"
       className={styles.copilotMessage}
-      disclaimer={<span>AI-generated content may be incorrect</span>}
+      disclaimer={<span>المحتوى المُنشأ بواسطة الذكاء الاصطناعي قد يكون غير دقيق</span>}
       footnote={
         <>
           {timestamp && <span className={styles.timestamp}>{timestamp}</span>}
@@ -44,6 +81,21 @@ function AssistantMessageComponent({
               info={message.more.usage} 
               duration={message.duration} 
             />
+          )}
+          {referenceComponents.length > 0 && (
+            <ReferenceList
+              maxVisibleReferences={2}
+              showLessButton={
+                <ReferenceOverflowButton>Show less</ReferenceOverflowButton>
+              }
+              showMoreButton={
+                <ReferenceOverflowButton
+                  text={(overflowCount) => `+${overflowCount}`}
+                />
+              }
+            >
+              {referenceComponents}
+            </ReferenceList>
           )}
         </>
       }
@@ -55,14 +107,9 @@ function AssistantMessageComponent({
           <span></span>
         </div>
       ) : (
-        <>
-          <Suspense fallback={<Spinner size="small" />}>
-            <Markdown content={message.content} />
-          </Suspense>
-          {message.citations && message.citations.length > 0 && (
-            <Citations citations={message.citations} />
-          )}
-        </>
+        <Suspense fallback={<Spinner size="small" />}>
+          <Markdown content={message.content} />
+        </Suspense>
       )}
     </CopilotMessage>
   );

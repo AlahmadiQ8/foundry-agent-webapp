@@ -59,7 +59,7 @@ function App() {
           name: 'Azure AI Agent',
           description: 'Your intelligent conversational partner powered by Azure AI',
           model: 'gpt-4o-mini',
-          metadata: { logo: 'Avatar_Default.svg' }
+          metadata: { logo: '/csc-logo.png' }
         });
         document.title = 'Azure AI Agent';
       } finally {
