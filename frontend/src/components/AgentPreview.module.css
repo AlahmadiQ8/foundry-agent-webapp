@@ -1,6 +1,8 @@
 .content {
   width: 100%;
   height: 100vh;
+  /* Use dvh for mobile browsers with dynamic viewport */
+  height: 100dvh;
   overflow: hidden;
   display: flex;
   flex-direction: column;

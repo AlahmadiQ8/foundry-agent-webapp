@@ -7,3 +7,15 @@
   pointer-events: none;
   z-index: 0;
 }
+
+@media (max-width: 768px) {
+  .wavesCanvas {
+    height: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wavesCanvas {
+    height: 150px;
+  }
+}

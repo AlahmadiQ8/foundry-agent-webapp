@@ -4,6 +4,19 @@
   padding-bottom: 0;
   gap: 2px;
   animation: fadeIn 0.3s ease-in;
+  margin: 0 16px;
+}
+
+@media (max-width: 768px) {
+  .userMessage {
+    margin: 0 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .userMessage {
+    margin: 0 4px;
+  }
 }
 
 @keyframes fadeIn {
@@ -70,6 +83,13 @@
   overflow: hidden;
   border: 1px solid var(--colorNeutralStroke1);
   background-color: var(--colorNeutralBackground1);
+}
+
+@media (max-width: 480px) {
+  .thumbnailItem {
+    width: 64px;
+    height: 64px;
+  }
 }
 
 .thumbnail {

@@ -146,6 +146,15 @@ const Heading6: Components['h6'] = ({ children, ...props }) => {
   return <h6 className={styles.heading6} {...props}>{children}</h6>;
 };
 
+// Custom table component with responsive wrapper
+const Table: Components['table'] = ({ children, ...props }) => {
+  return (
+    <div className={styles.tableWrapper}>
+      <table {...props}>{children}</table>
+    </div>
+  );
+};
+
 export function Markdown({ content }: MarkdownProps) {
   return (
     <div className={styles.markdown}>
@@ -177,6 +186,7 @@ export function Markdown({ content }: MarkdownProps) {
           h4: Heading4,
           h5: Heading5,
           h6: Heading6,
+          table: Table,
         }}
       >
         {content}

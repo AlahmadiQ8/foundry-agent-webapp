@@ -5,6 +5,18 @@
   animation: fadeIn 0.3s ease-in;
 }
 
+@media (max-width: 768px) {
+  .copilotMessage {
+    margin: 0 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .copilotMessage {
+    margin: 0 4px;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
