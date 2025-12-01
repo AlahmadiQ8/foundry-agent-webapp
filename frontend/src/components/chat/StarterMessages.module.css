@@ -36,10 +36,12 @@
   height: 48px;
 }
 
+/* Override Fluent UI's default text-align: start on Subtitle1/Body1 components */
 .welcome,
 .caption {
-  text-align: center;
+  text-align: center !important;
   text-wrap: balance;
+  width: 100%;
 }
 
 .caption {
