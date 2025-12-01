@@ -9,6 +9,15 @@
   background-color: var(--colorNeutralBackground2);
   border-radius: 8px;
   border: 1px solid var(--colorNeutralStroke2);
+  margin: 1rem;
+}
+
+@media (max-width: 480px) {
+  .errorContainer {
+    padding: 1.5rem;
+    margin: 0.5rem;
+    min-height: 200px;
+  }
 }
 
 .errorIcon {

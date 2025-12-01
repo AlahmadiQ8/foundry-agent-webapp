@@ -60,6 +60,12 @@
   border-bottom: 1px solid var(--colorNeutralStroke2);
 }
 
+@media (max-width: 480px) {
+  .codeHeader {
+    padding: 6px 12px;
+  }
+}
+
 .codeLanguage {
   font-size: 12px;
   font-weight: 600;
@@ -174,10 +180,31 @@
   margin-bottom: 16px;
 }
 
+/* Responsive table wrapper for horizontal scrolling */
+.tableWrapper {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  .markdown table {
+    font-size: 13px;
+  }
+}
+
 .markdown th,
 .markdown td {
   padding: 8px 12px;
   border: 1px solid var(--colorNeutralStroke2);
+}
+
+@media (max-width: 480px) {
+  .markdown th,
+  .markdown td {
+    padding: 6px 8px;
+  }
 }
 
 .markdown th {
