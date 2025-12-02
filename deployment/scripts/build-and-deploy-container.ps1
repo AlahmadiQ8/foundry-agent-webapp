@@ -64,8 +64,22 @@ if ($dockerCommand) {
     # Docker command exists, verify daemon is running
     $dockerVersion = docker version --format '{{.Server.Version}}' 2>$null
     if ($LASTEXITCODE -eq 0 -and $dockerVersion) {
-        $dockerAvailable = $true
-        Write-Host "[OK] Docker daemon is running (version: $dockerVersion)" -ForegroundColor Gray
+        # Check if running on ARM64 architecture
+        $isArm64 = $false
+        if ($IsWindows) {
+            $arch = (Get-CimInstance Win32_Processor).Architecture
+            # 12 = ARM64, 9 = x64
+            if ($arch -eq 12) {
+                $isArm64 = $true
+                Write-Host "[!] ARM64 Windows detected - cross-platform Docker builds to linux/amd64 are unstable" -ForegroundColor Yellow
+                Write-Host "[!] Using ACR cloud build instead for reliable linux/amd64 builds..." -ForegroundColor Yellow
+            }
+        }
+        
+        if (-not $isArm64) {
+            $dockerAvailable = $true
+            Write-Host "[OK] Docker daemon is running (version: $dockerVersion)" -ForegroundColor Gray
+        }
     } else {
         Write-Host "[!] Docker is installed but not running. Using ACR cloud build instead..." -ForegroundColor Yellow
     }
