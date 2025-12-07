@@ -1,4 +1,3 @@
-using Azure;
 using Azure.AI.Projects;
 using Azure.AI.Projects.OpenAI;
 using Azure.Core;
@@ -274,11 +273,13 @@ public class AzureAIAgentService : IDisposable
                         citations.Add(new ChatCitation
                         {
                             Uri = uriCitation.Uri?.ToString() ?? string.Empty,
-                            Title = uriCitation.Title
+                            Title = uriCitation.Title,
+                            StartIndex = uriCitation.StartIndex,
+                            EndIndex = uriCitation.EndIndex
                         });
                         
-                        _logger.LogDebug("Output URI Citation: URI={Uri}, Title={Title}",
-                            uriCitation.Uri, uriCitation.Title);
+                        _logger.LogDebug("Output URI Citation: URI={Uri}, Title={Title}, StartIndex={StartIndex}, EndIndex={EndIndex}",
+                            uriCitation.Uri, uriCitation.Title, uriCitation.StartIndex, uriCitation.EndIndex);
                     }
                     else
                     {

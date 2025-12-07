@@ -216,3 +216,13 @@
 .markdown tr:nth-child(even) {
   background-color: var(--colorNeutralBackground2);
 }
+
+/* Inline citation markers (superscript) */
+.markdown sup {
+  font-size: 0.75em;
+  font-weight: 600;
+  color: var(--colorBrandForeground1);
+  vertical-align: super;
+  line-height: 0;
+  margin: 0 2px;
+}

@@ -10,6 +10,7 @@ import { Markdown } from '../core/Markdown';
 import { AgentIcon } from '../core/AgentIcon';
 import { UsageInfo } from './UsageInfo';
 import { useFormatTimestamp } from '../../hooks/useFormatTimestamp';
+import { insertInlineCitations } from '../../utils/citationUtils';
 import type { IChatItem } from '../../types/chat';
 import styles from './AssistantMessage.module.css';
 
@@ -31,6 +32,11 @@ function AssistantMessageComponent({
   
   // Show custom loading indicator when streaming with no content
   const showLoadingDots = isStreaming && !message.content;
+  
+  // Process content to insert inline citation markers
+  const contentWithCitations = useMemo(() => {
+    return insertInlineCitations(message.content, message.citations);
+  }, [message.content, message.citations]);
   
   // Generate reference components from message citations
   const referenceComponents = useMemo(() => {
@@ -108,7 +114,7 @@ function AssistantMessageComponent({
         </div>
       ) : (
         <Suspense fallback={<Spinner size="small" />}>
-          <Markdown content={message.content} />
+          <Markdown content={contentWithCitations} />
         </Suspense>
       )}
     </CopilotMessage>

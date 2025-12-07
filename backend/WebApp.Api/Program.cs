@@ -243,15 +243,10 @@ app.MapPost("/api/chat/stream", async (
         var citations = await agentService.GetLastRunCitationsAsync(cancellationToken);
         if (citations != null && citations.Count > 0)
         {
-            // Deduplicate citations by URI before adding SAS tokens
-            var uniqueCitations = citations
-                .GroupBy(c => c.Uri)
-                .Select(g => g.First())
-                .ToList();
             
             // Append SAS tokens to unique citation URIs
             var citationsWithSas = new List<ChatCitation>();
-            foreach (var citation in uniqueCitations)
+            foreach (var citation in citations)
             {
                 var uriWithSas = await blobSasService.AppendSasTokenAsync(citation.Uri, cancellationToken);
                 citationsWithSas.Add(citation with { Uri = uriWithSas });
@@ -325,7 +320,7 @@ static async Task WriteCitationsEvent(HttpResponse response, List<ChatCitation> 
     var json = System.Text.Json.JsonSerializer.Serialize(new
     {
         type = "citations",
-        citations = citations.Select(c => new { uri = c.Uri, title = c.Title })
+        citations = citations.Select(c => new { uri = c.Uri, title = c.Title, startIndex = c.StartIndex, endIndex = c.EndIndex })
     });
     await response.WriteAsync($"data: {json}\n\n", ct);
     await response.Body.FlushAsync(ct);

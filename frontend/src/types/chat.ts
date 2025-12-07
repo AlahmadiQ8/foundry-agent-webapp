@@ -28,6 +28,8 @@ export interface IFileAttachment {
 export interface ICitation {
   uri: string;
   title?: string | null;
+  startIndex?: number | null;
+  endIndex?: number | null;
 }
 
 // Agent metadata types
