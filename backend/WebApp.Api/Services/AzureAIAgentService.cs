@@ -5,6 +5,7 @@ using Azure.Identity;
 using OpenAI.Responses;
 using System.Runtime.CompilerServices;
 using WebApp.Api.Models;
+using System.Linq;
 
 namespace WebApp.Api.Services;
 
@@ -377,7 +378,10 @@ public class AzureAIAgentService : IDisposable
         var validationErrors = ValidateImageDataUris(imageDataUris);
         if (validationErrors.Count > 0)
         {
-            _logger.LogWarning("Image attachment validation failed: {Errors}", string.Join("; ", validationErrors));
+            _logger.LogWarning(
+                "Image attachment validation failed: {Errors}",
+                string.Join("; ", validationErrors.Select(e => e.Replace("\r", "").Replace("\n", "")))
+            );
             throw new ArgumentException($"Invalid image attachments: {string.Join(", ", validationErrors)}");
         }
         
